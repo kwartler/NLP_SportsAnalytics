@@ -1,0 +1,161 @@
+---
+title: "Workout Comparisons"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows  
+    vertical_layout: scroll
+    source_code: embed
+---
+
+```{r setup, include=FALSE}
+
+# Libraries
+library(flexdashboard)
+library(reshape2)
+library(ggplot2)
+library(ggthemes)
+library(viridisLite)
+
+# Inputs
+playerDemos <- data.frame(Name   = 'Justin Billey',
+                          Pos    = 'RB',
+                          Ht     = paste(76 %/%12, 'ft',
+                                         76 %%12, 'in'),
+                          Wt     = '215',
+                          Edu    = 'Hard Knocks')
+
+playerEvals <- data.frame(Forty     = 4.56,
+                          Vertical  = 38.5,
+                          BenchReps = 16,
+                          Cone      = 6.84,
+                          Shuttle   = 4.20)
+
+history <- read.csv('~/Documents/NFL Combine Baker Book/historical.csv')
+
+# Clean, remove NAs rather than impute 
+history <- history[complete.cases(history),]
+
+evals <- history[,c('Forty', 'Vertical','BenchReps','Cone', 'Shuttle', 'draftStatus','Pos')]
+evals <- melt(evals)
+
+
+plotData <- subset(evals, as.character(evals$Pos)==as.character(playerDemos[1,2]))
+plotData <- split(plotData, plotData$variable)
+muData   <- lapply(plotData, 
+                   function(x) aggregate(value ~ draftStatus, data = x, FUN = mean))
+
+# Color Blind ok Hex
+valueBoxCols <- viridis(5)
+```
+
+Row 
+--------------------------------------
+### Player Name
+```{r}
+valueBox(value = playerDemos[1,1],icon = "fa-user-plus",color = valueBoxCols[1])
+```
+
+### Position
+```{r}
+valueBox(value = playerDemos[1,2],
+         icon = "fa-football-ball",
+         caption = "", 
+         color = valueBoxCols[2])
+```
+
+### Ht
+```{r}
+valueBox(value = playerDemos[1,3],
+         icon = "fa-ruler-vertical", 
+         color = valueBoxCols[3])
+```
+
+### Wt
+```{r}
+valueBox(value = playerDemos[1,4],
+         icon = "fa-weight",
+         color = valueBoxCols[4])
+```
+
+### Wt
+```{r}
+valueBox(value = playerDemos[1,5],
+         icon = "fa-school",
+         color = valueBoxCols[5])
+```
+
+
+Row 
+--------------------------------------
+### Forty
+```{r}
+statNum <- 1
+ggplot(plotData[[statNum]], aes(value, fill = draftStatus)) +
+  geom_density(alpha = 0.75) + 
+  geom_vline(data=playerEvals, aes(xintercept=playerEvals[1,statNum]), color='black') +
+  geom_vline(data = muData[[statNum]],aes(xintercept = value,colour = draftStatus), linetype = "dashed") + 
+  scale_color_manual(values = c('darkgreen', 'darkred')) +
+  scale_fill_viridis_d('Draft Status', option = 'C') + theme_hc() +
+  theme(axis.title.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank())
+```
+
+### Vertical
+```{r}
+statNum <- 2
+ggplot(plotData[[statNum]], aes(value, fill = draftStatus)) +
+  geom_density(alpha = 0.75) + 
+  geom_vline(data=playerEvals, aes(xintercept=playerEvals[1,statNum]), color='black') +
+  geom_vline(data = muData[[statNum]],aes(xintercept = value,colour = draftStatus), linetype = "dashed") + 
+  scale_color_manual(values = c('darkgreen', 'darkred')) +
+  scale_fill_viridis_d('Draft Status', option = 'C') + theme_hc() +
+  theme(axis.title.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank())
+```
+
+
+Row {data-width=150}
+--------------------------------------
+### Bench Reps
+```{r}
+statNum <- 3
+ggplot(plotData[[statNum]], aes(value, fill = draftStatus)) +
+  geom_density(alpha = 0.75) + 
+  geom_vline(data=playerEvals, aes(xintercept=playerEvals[1,statNum]), color='black') +
+  geom_vline(data = muData[[statNum]],aes(xintercept = value,colour = draftStatus), linetype = "dashed") + 
+  scale_color_manual(values = c('darkgreen', 'darkred')) +
+  scale_fill_viridis_d('Draft Status', option = 'C') + theme_hc() +
+  theme(axis.title.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank())
+```
+
+### Cone
+```{r}
+statNum <- 4
+ggplot(plotData[[statNum]], aes(value, fill = draftStatus)) +
+  geom_density(alpha = 0.75) + 
+  geom_vline(data=playerEvals, aes(xintercept=playerEvals[1,statNum]), color='black') +
+  geom_vline(data = muData[[statNum]],aes(xintercept = value,colour = draftStatus), linetype = "dashed") + 
+  scale_color_manual(values = c('darkgreen', 'darkred')) +
+  scale_fill_viridis_d('Draft Status', option = 'C') + theme_hc() +
+  theme(axis.title.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank())
+```
+
+### Shuttle
+```{r}
+statNum <- 4
+ggplot(plotData[[statNum]], aes(value, fill = draftStatus)) +
+  geom_density(alpha = 0.75) + 
+  geom_vline(data=playerEvals, aes(xintercept=playerEvals[1,statNum]), color='black') +
+  geom_vline(data = muData[[statNum]],aes(xintercept = value,colour = draftStatus), linetype = "dashed") + 
+  scale_color_manual(values = c('darkgreen', 'darkred')) +
+  scale_fill_viridis_d('Draft Status', option = 'C') + theme_hc() +
+  theme(axis.title.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank())
+```
